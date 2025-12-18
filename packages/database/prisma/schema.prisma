@@ -67,3 +67,36 @@ model Verification {
 
   @@map("verifications")
 }
+
+model Company {
+  id        String   @id @default(cuid())
+  name      String
+  siret     String?  @unique
+  address   String?
+  city      String?
+  zipCode   String?  @map("zip_code")
+  phone     String?
+  email     String?
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  leads Lead[]
+
+  @@map("companies")
+}
+
+model Lead {
+  id        String   @id @default(cuid())
+  firstName String   @map("first_name")
+  lastName  String   @map("last_name")
+  email     String?
+  phone     String?
+  status    String   @default("NEW")
+  companyId String?  @map("company_id")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  company Company? @relation(fields: [companyId], references: [id])
+
+  @@map("leads")
+}

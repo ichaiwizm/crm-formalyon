@@ -2,6 +2,8 @@ import { Hono } from 'hono'
 import { serve } from '@hono/node-server'
 import { cors } from 'hono/cors'
 import { auth } from './lib/auth'
+import { companies } from './modules/companies/companies.routes'
+import { leads } from './modules/leads/leads.routes'
 
 const app = new Hono()
 
@@ -21,6 +23,9 @@ app.get('/health', (c) => {
 app.on(['POST', 'GET'], '/api/auth/*', (c) => {
   return auth.handler(c.req.raw)
 })
+
+app.route('/api/companies', companies)
+app.route('/api/leads', leads)
 
 const port = 3000
 console.log(`Server running on http://localhost:${port}`)
