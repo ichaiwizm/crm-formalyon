@@ -1,10 +1,11 @@
-const API_URL = 'http://localhost:3000'
+import type { User, AuthSession } from '@formalyon/shared'
+import { env } from './env'
 
 export async function api<T>(
   endpoint: string,
   options: RequestInit = {}
 ): Promise<T> {
-  const response = await fetch(`${API_URL}${endpoint}`, {
+  const response = await fetch(`${env.API_URL}${endpoint}`, {
     ...options,
     credentials: 'include',
     headers: {
@@ -14,8 +15,8 @@ export async function api<T>(
   })
 
   if (!response.ok) {
-    const error = await response.json().catch(() => ({}))
-    throw new Error(error.message || `HTTP ${response.status}`)
+    const error = await response.json().catch(() => ({ error: 'Erreur réseau' }))
+    throw new Error(error.error || error.message || `HTTP ${response.status}`)
   }
 
   return response.json()
@@ -37,27 +38,12 @@ export const authApi = {
   logout: () =>
     api<{ success: boolean }>('/api/auth/sign-out', {
       method: 'POST',
-      headers: { Origin: 'http://localhost:5173' },
+      headers: { Origin: env.APP_URL },
       body: JSON.stringify({}),
     }),
 
   getSession: () =>
-    api<{ user: User; session: Session } | null>('/api/auth/get-session'),
+    api<AuthSession | null>('/api/auth/get-session'),
 }
 
-export interface User {
-  id: string
-  email: string
-  name: string | null
-  emailVerified: boolean
-  image: string | null
-  createdAt: string
-  updatedAt: string
-}
-
-export interface Session {
-  id: string
-  userId: string
-  token: string
-  expiresAt: string
-}
+export type { User }

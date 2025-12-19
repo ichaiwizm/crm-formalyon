@@ -10,14 +10,9 @@ export function Login({ onSuccess }: LoginProps) {
   const [password, setPassword] = useState('')
   const { login, loginError, isLoggingIn } = useAuth()
 
-  async function handleSubmit(e: FormEvent) {
+  function handleSubmit(e: FormEvent) {
     e.preventDefault()
-    try {
-      await login({ email, password })
-      onSuccess()
-    } catch {
-      // Error handled by loginError
-    }
+    login({ email, password }).then(onSuccess)
   }
 
   return (
