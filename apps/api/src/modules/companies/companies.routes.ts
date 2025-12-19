@@ -1,7 +1,11 @@
 import { Hono } from 'hono'
+import { requireAuth } from '../../middlewares/auth'
+import { createCompanySchema, updateCompanySchema } from './companies.schema'
 import * as companyService from './companies.service'
 
 const companies = new Hono()
+
+companies.use('/*', requireAuth)
 
 companies.get('/', async (c) => {
   const data = await companyService.list()
@@ -19,14 +23,26 @@ companies.get('/:id', async (c) => {
 
 companies.post('/', async (c) => {
   const body = await c.req.json()
-  const data = await companyService.create(body)
+  const result = createCompanySchema.safeParse(body)
+
+  if (!result.success) {
+    return c.json({ error: 'Validation failed', details: result.error.flatten() }, 400)
+  }
+
+  const data = await companyService.create(result.data)
   return c.json(data, 201)
 })
 
 companies.put('/:id', async (c) => {
   const id = c.req.param('id')
   const body = await c.req.json()
-  const data = await companyService.update(id, body)
+  const result = updateCompanySchema.safeParse(body)
+
+  if (!result.success) {
+    return c.json({ error: 'Validation failed', details: result.error.flatten() }, 400)
+  }
+
+  const data = await companyService.update(id, result.data)
   return c.json(data)
 })
 

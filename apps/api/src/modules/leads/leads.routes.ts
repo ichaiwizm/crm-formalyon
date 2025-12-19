@@ -1,7 +1,11 @@
 import { Hono } from 'hono'
+import { requireAuth } from '../../middlewares/auth'
+import { createLeadSchema, updateLeadSchema } from './leads.schema'
 import * as leadService from './leads.service'
 
 const leads = new Hono()
+
+leads.use('/*', requireAuth)
 
 leads.get('/', async (c) => {
   const data = await leadService.list()
@@ -19,14 +23,26 @@ leads.get('/:id', async (c) => {
 
 leads.post('/', async (c) => {
   const body = await c.req.json()
-  const data = await leadService.create(body)
+  const result = createLeadSchema.safeParse(body)
+
+  if (!result.success) {
+    return c.json({ error: 'Validation failed', details: result.error.flatten() }, 400)
+  }
+
+  const data = await leadService.create(result.data)
   return c.json(data, 201)
 })
 
 leads.put('/:id', async (c) => {
   const id = c.req.param('id')
   const body = await c.req.json()
-  const data = await leadService.update(id, body)
+  const result = updateLeadSchema.safeParse(body)
+
+  if (!result.success) {
+    return c.json({ error: 'Validation failed', details: result.error.flatten() }, 400)
+  }
+
+  const data = await leadService.update(id, result.data)
   return c.json(data)
 })
 

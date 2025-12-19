@@ -13,7 +13,8 @@
     "@formalyon/database": "workspace:*",
     "@hono/node-server": "^1.13.0",
     "better-auth": "^1.4.7",
-    "hono": "^4.6.0"
+    "hono": "^4.6.0",
+    "zod": "^4.2.1"
   },
   "devDependencies": {
     "@types/node": "^22.10.0",
