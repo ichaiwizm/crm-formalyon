@@ -11,6 +11,3 @@ export const createLeadSchema = z.object({
 })
 
 export const updateLeadSchema = createLeadSchema.partial()
-
-export type CreateLeadInput = z.infer<typeof createLeadSchema>
-export type UpdateLeadInput = z.infer<typeof updateLeadSchema>

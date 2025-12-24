@@ -1,5 +1,4 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import type { User } from '@formalyon/shared'
 import { authApi } from '../lib/api'
 
 export function useAuth() {
@@ -27,7 +26,7 @@ export function useAuth() {
   })
 
   return {
-    user: session?.user as User | null,
+    user: session?.user ?? null,
     isLoading,
     isAuthenticated: !!session?.user,
     login: loginMutation.mutateAsync,

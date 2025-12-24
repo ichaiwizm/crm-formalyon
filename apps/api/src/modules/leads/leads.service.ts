@@ -1,4 +1,4 @@
-import { prisma, type LeadStatus } from '@formalyon/database'
+import { prisma, type Prisma } from '@formalyon/database'
 
 export async function list() {
   return prisma.lead.findMany({
@@ -14,32 +14,14 @@ export async function getById(id: string) {
   })
 }
 
-interface CreateLeadData {
-  firstName: string
-  lastName: string
-  email?: string
-  phone?: string
-  status?: LeadStatus
-  companyId?: string
-}
-
-export async function create(data: CreateLeadData) {
+export async function create(data: Prisma.LeadUncheckedCreateInput) {
   return prisma.lead.create({
     data,
     include: { company: true },
   })
 }
 
-interface UpdateLeadData {
-  firstName?: string
-  lastName?: string
-  email?: string
-  phone?: string
-  status?: LeadStatus
-  companyId?: string
-}
-
-export async function update(id: string, data: UpdateLeadData) {
+export async function update(id: string, data: Prisma.LeadUncheckedUpdateInput) {
   return prisma.lead.update({
     where: { id },
     data,

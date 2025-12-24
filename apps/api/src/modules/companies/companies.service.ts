@@ -1,4 +1,4 @@
-import { prisma } from '@formalyon/database'
+import { prisma, type Prisma } from '@formalyon/database'
 
 export async function list() {
   return prisma.company.findMany({
@@ -13,30 +13,11 @@ export async function getById(id: string) {
   })
 }
 
-export async function create(data: {
-  name: string
-  siret?: string
-  address?: string
-  city?: string
-  zipCode?: string
-  phone?: string
-  email?: string
-}) {
+export async function create(data: Prisma.CompanyCreateInput) {
   return prisma.company.create({ data })
 }
 
-export async function update(
-  id: string,
-  data: {
-    name?: string
-    siret?: string
-    address?: string
-    city?: string
-    zipCode?: string
-    phone?: string
-    email?: string
-  }
-) {
+export async function update(id: string, data: Prisma.CompanyUpdateInput) {
   return prisma.company.update({
     where: { id },
     data,

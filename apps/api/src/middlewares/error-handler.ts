@@ -1,21 +1,19 @@
 import type { Context } from 'hono'
-import type { ZodError } from 'zod'
+import { ZodError } from 'zod'
 import { env } from '../lib/env'
 import { logger } from '../lib/logger'
 import { PRISMA_ERROR, ERROR_MESSAGE } from '../lib/constants'
 
-interface PrismaError {
-  code?: string
-  meta?: { cause?: string }
+function isPrismaError(err: unknown): err is { code: string } {
+  return typeof err === 'object' && err !== null && 'code' in err
 }
 
 export function errorHandler(err: Error, c: Context) {
   logger.error('API Error', err)
 
   // Prisma errors
-  const prismaError = err as PrismaError
-  if (prismaError.code) {
-    switch (prismaError.code) {
+  if (isPrismaError(err)) {
+    switch (err.code) {
       case PRISMA_ERROR.UNIQUE_CONSTRAINT:
         return c.json({ error: ERROR_MESSAGE.UNIQUE_CONSTRAINT }, 409)
       case PRISMA_ERROR.NOT_FOUND:
@@ -28,10 +26,9 @@ export function errorHandler(err: Error, c: Context) {
   }
 
   // Zod validation errors
-  if (err.name === 'ZodError') {
-    const zodError = err as ZodError
+  if (err instanceof ZodError) {
     const details = env.NODE_ENV === 'development'
-      ? zodError.issues.map((e) => ({ path: e.path.join('.'), message: e.message }))
+      ? err.issues.map((e) => ({ path: e.path.join('.'), message: e.message }))
       : undefined
     return c.json({ error: ERROR_MESSAGE.VALIDATION_FAILED, details }, 400)
   }
