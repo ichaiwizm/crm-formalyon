@@ -1,3 +1,5 @@
+import type { LeadStatus } from './constants'
+
 // Auth types
 export interface User {
   id: string
@@ -60,7 +62,7 @@ export interface UpdateCompanyInput {
 }
 
 // Lead types
-export type LeadStatus = 'NEW' | 'CONTACTED' | 'QUALIFIED' | 'CONVERTED' | 'LOST'
+export type { LeadStatus } from './constants'
 
 export interface Lead {
   id: string

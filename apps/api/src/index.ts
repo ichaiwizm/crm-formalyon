@@ -2,6 +2,7 @@ import { Hono } from 'hono'
 import { serve } from '@hono/node-server'
 import { cors } from 'hono/cors'
 import { env } from './lib/env'
+import { logger } from './lib/logger'
 import { auth } from './lib/auth'
 import { errorHandler } from './middlewares/error-handler'
 import { companies } from './modules/companies/companies.routes'
@@ -31,7 +32,7 @@ app.on(['POST', 'GET'], '/api/auth/*', (c) => {
 app.route('/api/companies', companies)
 app.route('/api/leads', leads)
 
-console.log(`Server running on ${env.BETTER_AUTH_URL}`)
+logger.info(`Server running on port ${env.PORT}`)
 
 serve({
   fetch: app.fetch,

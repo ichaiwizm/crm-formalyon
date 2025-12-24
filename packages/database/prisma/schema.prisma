@@ -68,6 +68,14 @@ model Verification {
   @@map("verifications")
 }
 
+enum LeadStatus {
+  NEW
+  CONTACTED
+  QUALIFIED
+  CONVERTED
+  LOST
+}
+
 model Company {
   id        String   @id @default(cuid())
   name      String
@@ -86,15 +94,15 @@ model Company {
 }
 
 model Lead {
-  id        String   @id @default(cuid())
-  firstName String   @map("first_name")
-  lastName  String   @map("last_name")
+  id        String     @id @default(cuid())
+  firstName String     @map("first_name")
+  lastName  String     @map("last_name")
   email     String?
   phone     String?
-  status    String   @default("NEW")
-  companyId String?  @map("company_id")
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
+  status    LeadStatus @default(NEW)
+  companyId String?    @map("company_id")
+  createdAt DateTime   @default(now()) @map("created_at")
+  updatedAt DateTime   @updatedAt @map("updated_at")
 
   company Company? @relation(fields: [companyId], references: [id])
 

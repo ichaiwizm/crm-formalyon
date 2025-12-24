@@ -1,6 +1,8 @@
 import { Hono } from 'hono'
 import type { z } from 'zod'
 import { requireAuth } from '../middlewares/auth'
+import { env } from './env'
+import { ERROR_MESSAGE } from './constants'
 
 interface CrudService<T, CreateInput, UpdateInput> {
   list: () => Promise<T[]>
@@ -15,6 +17,11 @@ interface CrudOptions<T, CreateInput, UpdateInput> {
   createSchema: z.ZodType<CreateInput>
   updateSchema: z.ZodType<UpdateInput>
   entityName: string
+}
+
+function formatValidationError(error: z.ZodError) {
+  if (env.NODE_ENV !== 'development') return undefined
+  return error.issues.map((e) => ({ path: e.path.join('.'), message: e.message }))
 }
 
 export function createCrudRoutes<T, CreateInput, UpdateInput>(
@@ -34,7 +41,7 @@ export function createCrudRoutes<T, CreateInput, UpdateInput>(
     const id = c.req.param('id')
     const data = await service.getById(id)
     if (!data) {
-      return c.json({ error: `${entityName} non trouvé` }, 404)
+      return c.json({ error: `${entityName} ${ERROR_MESSAGE.NOT_FOUND.toLowerCase()}` }, 404)
     }
     return c.json(data)
   })
@@ -43,7 +50,7 @@ export function createCrudRoutes<T, CreateInput, UpdateInput>(
     const body = await c.req.json()
     const result = createSchema.safeParse(body)
     if (!result.success) {
-      return c.json({ error: 'Validation échouée', details: result.error.flatten() }, 400)
+      return c.json({ error: ERROR_MESSAGE.VALIDATION_FAILED, details: formatValidationError(result.error) }, 400)
     }
     const data = await service.create(result.data)
     return c.json(data, 201)
@@ -54,7 +61,7 @@ export function createCrudRoutes<T, CreateInput, UpdateInput>(
     const body = await c.req.json()
     const result = updateSchema.safeParse(body)
     if (!result.success) {
-      return c.json({ error: 'Validation échouée', details: result.error.flatten() }, 400)
+      return c.json({ error: ERROR_MESSAGE.VALIDATION_FAILED, details: formatValidationError(result.error) }, 400)
     }
     const data = await service.update(id, result.data)
     return c.json(data)
