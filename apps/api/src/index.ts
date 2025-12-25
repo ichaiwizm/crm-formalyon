@@ -5,6 +5,7 @@ import { env } from './lib/env'
 import { logger } from './lib/logger'
 import { auth } from './lib/auth'
 import { errorHandler } from './middlewares/error-handler'
+import { rateLimit } from './middlewares/rate-limit'
 import { companies } from './modules/companies/companies.routes'
 import { leads } from './modules/leads/leads.routes'
 
@@ -25,7 +26,12 @@ app.get('/health', (c) => {
   return c.json({ ok: true })
 })
 
-app.on(['POST', 'GET'], '/api/auth/*', (c) => {
+// Auth routes with rate limiting on POST (sign-in, sign-up)
+app.post('/api/auth/*', rateLimit, (c) => {
+  return auth.handler(c.req.raw)
+})
+
+app.get('/api/auth/*', (c) => {
   return auth.handler(c.req.raw)
 })
 

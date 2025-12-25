@@ -13,4 +13,5 @@ export const ERROR_MESSAGE = {
   DATABASE_ERROR: 'Erreur base de données',
   VALIDATION_FAILED: 'Validation échouée',
   SERVER_ERROR: 'Erreur serveur',
+  RATE_LIMITED: 'Trop de tentatives, réessayez plus tard',
 } as const

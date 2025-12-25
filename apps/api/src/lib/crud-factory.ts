@@ -4,8 +4,19 @@ import { requireAuth } from '../middlewares/auth'
 import { env } from './env'
 import { ERROR_MESSAGE } from './constants'
 
+interface PaginationOptions {
+  cursor?: string
+  limit?: number
+}
+
+interface PaginatedResult<T> {
+  data: T[]
+  nextCursor: string | null
+  hasMore: boolean
+}
+
 interface CrudService<T, CreateInput, UpdateInput> {
-  list: () => Promise<T[]>
+  list: (options?: PaginationOptions) => Promise<PaginatedResult<T>>
   getById: (id: string) => Promise<T | null>
   create: (data: CreateInput) => Promise<T>
   update: (id: string, data: UpdateInput) => Promise<T>
@@ -33,8 +44,11 @@ export function createCrudRoutes<T, CreateInput, UpdateInput>(
   router.use('/*', requireAuth)
 
   router.get('/', async (c) => {
-    const data = await service.list()
-    return c.json(data)
+    const cursor = c.req.query('cursor')
+    const limitParam = c.req.query('limit')
+    const limit = limitParam ? parseInt(limitParam, 10) : undefined
+    const result = await service.list({ cursor, limit })
+    return c.json(result)
   })
 
   router.get('/:id', async (c) => {
