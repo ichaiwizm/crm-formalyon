@@ -45,5 +45,3 @@ export const authApi = {
   getSession: () =>
     api<AuthSession | null>('/api/auth/get-session'),
 }
-
-export type { User }

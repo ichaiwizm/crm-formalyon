@@ -23,6 +23,9 @@ importers:
       '@formalyon/database':
         specifier: workspace:*
         version: link:../../packages/database
+      '@formalyon/shared':
+        specifier: workspace:*
+        version: link:../../packages/shared
       '@hono/node-server':
         specifier: ^1.13.0
         version: 1.19.7(hono@4.11.1)
